@@ -13,6 +13,11 @@ public class ballController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(Input.GetKey("left")){
+            gameObject.transform.Translate(-10 * Time.deltaTime,0,0);
+        }
+        if(Input.GetKey("right")){
+            gameObject.transform.Translate(10 * Time.deltaTime,0,0);
+        }
     }
 }
