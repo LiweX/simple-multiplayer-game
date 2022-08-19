@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ballController : MonoBehaviour
 {
-    int jumps;
+    int jumps=0;
     // Start is called before the first frame update
     void Start()
     {
