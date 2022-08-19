@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class inputReader : MonoBehaviour
 {
-    private string ip;
+    public string ip;
     public void readInputField(string s){
         ip=s;
-        Debug.Log(ip);
     }
 }
