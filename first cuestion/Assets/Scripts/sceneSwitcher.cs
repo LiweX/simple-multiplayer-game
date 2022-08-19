@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using HybridWebSocket;
+
 public class sceneSwitcher : MonoBehaviour
 {
     private inputReader ipObject;
@@ -23,6 +24,8 @@ public class sceneSwitcher : MonoBehaviour
             Debug.Log("WS state: " + ws.GetState().ToString());
 
             ws.Send(Encoding.UTF8.GetBytes("Hello from Unity 3D!"));
+
+            
             
         };
         ws.OnMessage += (byte[] msg) =>
@@ -42,7 +45,8 @@ public class sceneSwitcher : MonoBehaviour
 
         // Connect to the server
         ws.Connect();
-        
+
+        SceneManager.LoadScene(1);
 
         
     }
