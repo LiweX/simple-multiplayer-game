@@ -6,10 +6,9 @@ public class inputReader : MonoBehaviour
 {
     private void Awake() {
         DontDestroyOnLoad(this);
-
     }
-    public string ip;
+    public string mensaje;
     public void readInputField(string s){
-        ip=s;
+        mensaje=s;
     }
 }

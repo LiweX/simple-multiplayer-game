@@ -1,16 +1,20 @@
-import socket
+from simple_websocket_server import WebSocketServer, WebSocket
 
-ip = "127.0.0.1"
-port = 8001
 
-server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-server.bind((ip,port))
-server.listen(5)
-client, address = server.accept()
-print(f"Connection Established - {address[0]}:{address[1]}")
+class ServerHandlers(WebSocket):
+    def handle(self):
+        cuenta = self.data.decode()
+        resultado = eval(cuenta)
+        print(cuenta)
+        print(resultado)
+        self.send_message(bytes(str(resultado),"utf-8"))
 
-while True:
-    string = client.recv(1024)
-    string = string.decode("utf-8")
-    print(string)
-    client.send(bytes("hello from python","utf-8"))
+    def connected(self):
+        print(self.address, 'connected')
+
+    def handle_close(self):
+        print(self.address, 'closed')
+
+
+server = WebSocketServer('', 9001, ServerHandlers)
+server.serve_forever()
