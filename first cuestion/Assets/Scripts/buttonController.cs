@@ -8,16 +8,19 @@ using NativeWebSocket;
 
 public class buttonController : MonoBehaviour
 {
-    public Text messageToSend;
+    public Text inputfield;
     public Text textOnScreen;
     public Client server;
 
 
-    public void trySendMessage(){
-        string msg = messageToSend.text;
-        Debug.Log(msg);
-        server.websocket.Send(Encoding.UTF8.GetBytes(msg));
+    public void buttonPress(){
+        string ip = inputfield.text;
+        Debug.Log(ip);
+        server.tryConnect(ip);
 
+    }
+    private void Update() {
+        if(server.connected) SceneManager.LoadScene(1);
     }
     public void changeScene(){
         SceneManager.LoadScene(1);

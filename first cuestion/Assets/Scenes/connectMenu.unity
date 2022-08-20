@@ -203,51 +203,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 38676722}
   m_CullTransparentMesh: 1
---- !u!1 &160393834
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 160393836}
-  - component: {fileID: 160393835}
-  m_Layer: 0
-  m_Name: ip
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &160393835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160393834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f6780337a79837428c1a6cc03dde432, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mensaje: 
---- !u!4 &160393836
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 160393834}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 549.2999, y: 261.2403, z: -0.31940064}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &376930469
 GameObject:
   m_ObjectHideFlags: 0
@@ -335,7 +290,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 376930474}
         m_TargetAssemblyTypeName: buttonController, Assembly-CSharp
-        m_MethodName: trySendMessage
+        m_MethodName: buttonPress
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -395,7 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbb58a5a0dd255a469c41c8596b615ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  messageToSend: {fileID: 559592962}
+  inputfield: {fileID: 559592962}
   textOnScreen: {fileID: 38676724}
   server: {fileID: 596292889}
 --- !u!1 &559592960
@@ -508,7 +463,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &596292889
 MonoBehaviour:
@@ -522,8 +477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fefcd4e358d659409f838217c337a81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  response: 
   texto: {fileID: 38676724}
+  connected: 0
 --- !u!1 &958890247
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,7 +912,7 @@ MonoBehaviour:
   m_OnDidEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 160393835}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: inputReader, Assembly-CSharp
         m_MethodName: readInputField
         m_Mode: 5

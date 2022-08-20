@@ -11,14 +11,20 @@ public class Client : MonoBehaviour
   public WebSocket websocket;
   public Text texto;
 
+  public bool connected = false;
+
   // Start is called before the first frame update
-  async void Start()
+  private void Awake() {
+    DontDestroyOnLoad(this);
+  }
+  async public void tryConnect(string ip)
   {
-    websocket = new WebSocket("ws://localhost:9001");
+    websocket = new WebSocket("ws://" + ip + ":9001");
 
     websocket.OnOpen += () =>
     {
       Debug.Log("Connection open!");
+      connected = true;
     };
 
     websocket.OnError += (e) =>
@@ -29,6 +35,7 @@ public class Client : MonoBehaviour
     websocket.OnClose += (e) =>
     {
       Debug.Log("Connection closed!");
+      connected = false;
     };
 
     websocket.OnMessage += (bytes) =>
@@ -51,9 +58,12 @@ public class Client : MonoBehaviour
 
   void Update()
   {
-    #if !UNITY_WEBGL || UNITY_EDITOR
+    if(connected){
+      #if !UNITY_WEBGL || UNITY_EDITOR
       websocket.DispatchMessageQueue();
-    #endif
+      #endif
+    }
+
   }
 
   async void SendWebSocketMessage()
