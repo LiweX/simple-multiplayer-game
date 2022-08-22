@@ -479,8 +479,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   texto: {fileID: 38676724}
   playerID: -1
+  enemyPosition:
+  - 0
+  - 0
+  - 0
   connected: 0
   readyToPlay: 0
+  gameOn: 0
 --- !u!1 &958890247
 GameObject:
   m_ObjectHideFlags: 0
