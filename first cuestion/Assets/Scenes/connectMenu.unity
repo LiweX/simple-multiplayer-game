@@ -158,8 +158,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -13.2, y: 99.4}
-  m_SizeDelta: {x: 160, y: 40.8694}
+  m_AnchoredPosition: {x: 88.53529, y: 98.0326}
+  m_SizeDelta: {x: 363.4706, y: 43.6042}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &38676724
 MonoBehaviour:
@@ -194,7 +194,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 
 --- !u!222 &38676725
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -478,7 +478,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texto: {fileID: 38676724}
+  playerID: -1
   connected: 0
+  readyToPlay: 0
 --- !u!1 &958890247
 GameObject:
   m_ObjectHideFlags: 0

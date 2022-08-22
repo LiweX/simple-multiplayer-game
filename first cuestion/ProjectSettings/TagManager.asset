@@ -6,6 +6,8 @@ TagManager:
   tags:
   - floor
   - coin
+  - redball
+  - blueball
   layers:
   - Default
   - TransparentFX

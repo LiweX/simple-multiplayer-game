@@ -20,7 +20,7 @@ public class buttonController : MonoBehaviour
 
     }
     private void Update() {
-        if(server.connected) SceneManager.LoadScene(1);
+        if(server.connected && server.readyToPlay)  changeScene();
     }
     public void changeScene(){
         SceneManager.LoadScene(1);

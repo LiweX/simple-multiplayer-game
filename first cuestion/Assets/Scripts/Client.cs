@@ -11,7 +11,11 @@ public class Client : MonoBehaviour
   public WebSocket websocket;
   public Text texto;
 
+  public int playerID = -1;
+  public float[] enemyPosition = new float[3];
   public bool connected = false;
+  public bool readyToPlay = false;
+  public bool gameOn = false;
 
   // Start is called before the first frame update
   private void Awake() {
@@ -40,13 +44,26 @@ public class Client : MonoBehaviour
 
     websocket.OnMessage += (bytes) =>
     {
-      Debug.Log("OnMessage!");
+      //Debug.Log("OnMessage!");
       //Debug.Log(bytes);
-      texto.text = System.Text.Encoding.UTF8.GetString(bytes);
+      var message = System.Text.Encoding.UTF8.GetString(bytes);
 
+      if(playerID<0)
+      {
+        int num = Int16.Parse(System.Text.Encoding.UTF8.GetString(bytes));
+        if((num%2) == 0) playerID = 2;
+        else playerID = 1;
+        texto.text = "Player " + playerID + " Ready";
+        websocket.SendText(playerID + " Ready");
+      } 
+      if(message == "Begin") readyToPlay=true;
       // getting the message as a string
-      // var message = System.Text.Encoding.UTF8.GetString(bytes);
-      // Debug.Log("OnMessage! " + message);
+      if(gameOn)
+      {
+        parseEnemyPositions(message);
+      }
+      
+      Debug.Log("OnMessage! " + message);
     };
 
     // Keep sending messages at every 0.3s
@@ -63,19 +80,8 @@ public class Client : MonoBehaviour
       websocket.DispatchMessageQueue();
       #endif
     }
+    if(connected && readyToPlay) gameOn=true;
 
-  }
-
-  async void SendWebSocketMessage()
-  {
-    if (websocket.State == WebSocketState.Open)
-    {
-      // Sending bytes
-      await websocket.Send(new byte[] { 10, 20, 30 });
-
-      // Sending plain text
-      await websocket.SendText("plain text message");
-    }
   }
 
   private async void OnApplicationQuit()
@@ -83,4 +89,11 @@ public class Client : MonoBehaviour
     await websocket.Close();
   }
 
+  private void parseEnemyPositions(string phrase)
+  { 
+    string[] words = phrase.Split(' ');
+    enemyPosition[0]=float.Parse(words[0]);
+    enemyPosition[1]=float.Parse(words[1]);
+    enemyPosition[2]=float.Parse(words[2]);
+  }
 }
