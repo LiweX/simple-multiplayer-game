@@ -1,26 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using NativeWebSocket;
-
 public class buttonController : MonoBehaviour
 {
-    public Text inputfield;
+    public Text inputfieldIP;
+    public Text inputfieldName;
     public Text textOnScreen;
     public Client server;
 
 
     public void buttonPress(){
-        string ip = inputfield.text;
-        Debug.Log(ip);
-        server.tryConnect(ip);
-
+        if(!server.connected) {
+            string ip = inputfieldIP.text;
+            string playerName = inputfieldName.text;
+            server.connectToServer(ip,playerName);
+        }
     }
     private void Update() {
-        if(server.connected && server.readyToPlay)  changeScene();
+        if(server.gameOn)  changeScene();
     }
     public void changeScene(){
         SceneManager.LoadScene(1);

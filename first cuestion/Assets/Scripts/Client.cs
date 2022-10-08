@@ -1,99 +1,185 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-using NativeWebSocket;
-
 public class Client : MonoBehaviour
-{
-  public WebSocket websocket;
-  public Text texto;
+{	
+	[System.Serializable]
+	public class PlayersList{
 
-  public int playerID = -1;
-  public float[] enemyPosition = new float[3];
+		[System.Serializable]
+		public class Player{
+			public string id;
+			public string name;
+
+			[System.Serializable]
+			public class Inputs{
+				public bool left;
+				public bool right;
+				public bool up;
+			}
+			public Inputs inputs;
+		}
+		public Player[] players;
+	}
+
+
+
+
+  public PlayersList players;
+  [System.Serializable]
+  public class Input{
+	public bool left;
+	public bool right;
+	public bool up;
+	public Input(){
+		this.left=false;
+		this.right=false;
+		this.up=false;
+	}
+  }
+public Input playerInput;
+public Input enemyInput;
+  public bool waiting = false;
   public bool connected = false;
   public bool readyToPlay = false;
   public bool gameOn = false;
+  public string ip;
+  public Toggle redBallToggle;
+  public Text displayText;
+  public string playerID; 
+  public string enemyID;
+  public string playerName;
+  public string enemyName;
+
+  public static Client instance;
+
 
   // Start is called before the first frame update
   private void Awake() {
+    instance=this;
     DontDestroyOnLoad(this);
   }
-  async public void tryConnect(string ip)
-  {
-    websocket = new WebSocket("ws://" + ip + ":9001");
-
-    websocket.OnOpen += () =>
-    {
-      Debug.Log("Connection open!");
-      connected = true;
-    };
-
-    websocket.OnError += (e) =>
-    {
-      Debug.Log("Error! " + e);
-    };
-
-    websocket.OnClose += (e) =>
-    {
-      Debug.Log("Connection closed!");
-      connected = false;
-    };
-
-    websocket.OnMessage += (bytes) =>
-    {
-      //Debug.Log("OnMessage!");
-      //Debug.Log(bytes);
-      var message = System.Text.Encoding.UTF8.GetString(bytes);
-
-      if(playerID<0)
-      {
-        int num = Int16.Parse(System.Text.Encoding.UTF8.GetString(bytes));
-        if((num%2) == 0) playerID = 2;
-        else playerID = 1;
-        texto.text = "Player " + playerID + " Ready";
-        websocket.SendText(playerID + " Ready");
-      } 
-      if(message == "Begin") readyToPlay=true;
-      // getting the message as a string
-      if(gameOn)
-      {
-        parseEnemyPositions(message);
-      }
-      
-      Debug.Log("OnMessage! " + message);
-    };
-
-    // Keep sending messages at every 0.3s
-    //InvokeRepeating("SendWebSocketMessage", 0.0f, 0.3f);
-
-    // waiting for messages
-    await websocket.Connect();
-  }
+  
 
   void Update()
   {
-    if(connected){
-      #if !UNITY_WEBGL || UNITY_EDITOR
-      websocket.DispatchMessageQueue();
-      #endif
-    }
-    if(connected && readyToPlay) gameOn=true;
-
+	if(waiting){
+		displayText.text="Esperando otro jugador";
+		checkPlayers();
+		
+	}
+    if(connected && readyToPlay) {
+		waiting=false;
+		gameOn=true;
+	}
   }
 
-  private async void OnApplicationQuit()
-  {
-    await websocket.Close();
-  }
+  	public void connectToServer (string ip,string name) {
+		this.ip=ip;
+		StartCoroutine(CoroutineConnect(ip,name)); 			
+	}
+	public void sendInput(Input input){
+		StartCoroutine(CoroutineSendInput(input));
+	}
+	public void checkPlayers(){
+		StartCoroutine(CoroutineCheckPlayers());
+	}
+	public void getEnemyInput(){
+		StartCoroutine(CoroutineEnemyInput());
+	}
+	public void getPlayersList(){
+		StartCoroutine(CoroutineGetPlayersList());
+	}
+	public void testSend(){
+		StartCoroutine(CoroutineTestingSend());
+	}
+	private IEnumerator CoroutineConnect(string ip,string name){
+		Debug.Log("Intentando conectar");
+		string url = "http://" + ip + ":3000/server";
+		Dictionary<string,string> form = new Dictionary<string, string>();
+		form.Add("name",name);
+		UnityWebRequest web = UnityWebRequest.Post(url,form);
+		web.SetRequestHeader("mode","no-cors");
+		yield return web.SendWebRequest();
+		if(web.responseCode==201){
+			Debug.Log("Conectado");
+			playerID=web.downloadHandler.text;
+			playerName=name;
+			connected=true;
+			waiting=true;
+			enemyInput=new Input();
+			playerInput=new Input();
+		}else Debug.Log("Error al conectar");
+	}
 
-  private void parseEnemyPositions(string phrase)
-  { 
-    string[] words = phrase.Split(' ');
-    enemyPosition[0]=float.Parse(words[0]);
-    enemyPosition[1]=float.Parse(words[1]);
-    enemyPosition[2]=float.Parse(words[2]);
-  }
+	private IEnumerator CoroutineEnemyInput(){
+		string url = "http://" + ip + ":3000/server/player/"+enemyID;
+		UnityWebRequest web = UnityWebRequest.Get(url);
+		web.SetRequestHeader("mode","no-cors");
+		yield return web.SendWebRequest();
+		if(web.responseCode==200){
+			enemyInput = JsonUtility.FromJson<Input>(web.downloadHandler.text);
+			
+		}else Debug.Log("Error en enemy input");
+	}
+
+	private IEnumerator CoroutineCheckPlayers(){
+		string url = "http://" + ip + ":3000/server/players";
+		UnityWebRequest web = UnityWebRequest.Get(url);
+		web.SetRequestHeader("mode","no-cors");
+		yield return web.SendWebRequest();
+		if(web.responseCode==200){
+			if(web.downloadHandler.text=="2") {
+				getPlayersList();
+				readyToPlay=true;
+			}
+
+		}else Debug.Log("Error en check players");
+	}
+
+	private IEnumerator CoroutineSendInput(Input input){
+		
+		string inputs = JsonUtility.ToJson(input);
+		UnityWebRequest web = UnityWebRequest.Put("http://" + ip + ":3000/server/player/"+playerID,"{\"inputs\": "+inputs+"}");
+		web.SetRequestHeader("Content-Type","application/json");
+		web.SetRequestHeader("mode","no-cors");
+		yield return web.SendWebRequest();
+		if(web.responseCode==200){
+		}else Debug.Log("Error en send input");
+	
+	}
+	private IEnumerator CoroutineTestingSend(){
+        UnityWebRequest web = UnityWebRequest.Put("http://" + ip + ":3000/server/test", "{\"test\":\"Hijo de puta\"}");
+		web.SetRequestHeader("Content-Type","application/json");
+        yield return web.SendWebRequest();
+        if(web.responseCode==200) {
+            Debug.Log(web.error);
+        }
+        else {
+            Debug.Log("Upload complete!");
+        }
+	
+	}
+	private IEnumerator CoroutineGetPlayersList(){
+		string url = "http://" + ip + ":3000/server";
+		UnityWebRequest web = UnityWebRequest.Get(url);
+		yield return web.SendWebRequest();
+		if(web.responseCode==200){
+			players = JsonUtility.FromJson<PlayersList>(web.downloadHandler.text);
+			if(players.players[0].id==playerID){
+				enemyID=players.players[1].id;
+				enemyName=players.players[1].name;
+			}else{
+				enemyID=players.players[0].id;
+				enemyName=players.players[0].name;
+			}
+
+		}else Debug.Log("Error en get players lists");
+	}
+
 }
+  
+	
